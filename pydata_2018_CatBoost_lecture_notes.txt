@@ -1,0 +1,93 @@
+Catboost - library for gradient boosting by yandex.
+
+https://www.youtube.com/watch?v=8o0e-r0B5xQ&t=358s
+
+Grad Boosting is best for heterogeneous data (tables do not have much 
+internal structure).
+
+Grad Boost is easy to use. Heavily used in finance to predict credict scoring,
+for recommender systems like song predictions.
+
+Neural networks work greate for homogenous data like images. It is a good
+idea to use neural networks together with grad_boosting. For image search 
+neural features are combined with other knowledge about the object and 
+gradient boosting is used on top of that.
+
+Grad.Boost. is an iterative algorithms based on decision trees.
+
+Why catboost? It outperforms LightGBM, XGBoost, H20. Catboost outperforms 
+all other algorithms even with default parameters. 
+
+Catboost always uses full binary trees that are symmetric. The same features
+are on the left and on the right. These are simple trees which helps with 
+preventing overfitting. And they work very fast. 
+
+For categorical features catboost calculates numeric features based on 
+categorical features. Onehot encodeing is performed Like assigning frequency 
+based of the category.  
+But works bad for single values. The dataset is split into two parts. On the first 
+part the statistics of features is calculated and on the second part it is 
+trained. That is bad too because only half of the dataset is used. So the 
+statistics for the features is computed on objects before the current. Random
+permutation is strictly required here. Each feature has its prior. 
+
+While selecting the first node only single categorical features are taken 
+into account. 
+
+One hot encoding is performed inside the algorithm. It is better not to mess 
+with it on the preprocessing stage. 
+
+Instead of classical boosting ordered boosting is used to prevent overfitting.
+
+pip install catboost
+
+Catboost has native GPU support. The more dta we have, the more speedup we 
+get with GPU. Catboost supports multiserver GPU training. Prediction time is
+fast because of binary trees. 
+
+Feature importance is included in Catboost. Feature interaction is more 
+computationally expensive. Tells which payers of features are interacting the 
+most. Per object feature importnace (SHAP) is feature importance for a particular 
+object. 
+
+shap_values = mode.get_feature_importance(data=Pool(X,y), fstr_type='ShapValues)
+shap.force_plot(shap_values[0,:], X,iloc[0,:])
+
+SHAP graphs in general give a lot of insights on how features affect the 
+decision making of the algorithm in general. We can also check which objects in 
+the dataset are the most important. If new features are added to the dataset 
+we can see if the improvement is statistically significant. 
+
+Automatic new feature evaluation (with statistical significance and p-value). 
+
+Overfitting detector. Also there is metric evaluation during training. Tensorboard 
+functionality is supported. 
+
+Missing values support is also present. 
+
+Cross validation is present in both regular form and stratified for imbalanced datasets.
+
+staged_predict + metric evaluation on dataset. 
+
+ Algorithm parameters:
+    learning rate + iterations. Validation error stats growing at some point, so we need
+    to wait until convergence. The less the learning rate - the better the quality of the
+    algorithm, but we need more iterations 
+
+    depth: the value 6 is set by default. But for some datasets we may need deeper trees.
+    the strategy here is to start with default and than increase the depth. 
+
+    l2 regularization. We can increase the value of l2 regularization if we see that 
+    we overfit too fast. 
+
+    bagging_temperature. While building trees catboost uses object sampling. 
+    Bagging_temperature confolds how intensive is the sampling. By default is set to 1
+    so all the sampling happens from exponential dist. Can be set to zero so there is no 
+    bagging at all. 
+
+    random_strength. When we are selecting the split you score each feature. And catboost
+    adds some randomness here. More randomness in the start and less randomness in the end.
+    Random noise helps deal with overfitting. 
+
+The way catboost deals with categorical values is explained in a separate technical 
+paper. 
